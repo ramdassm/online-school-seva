@@ -1,0 +1,12 @@
+
+{
+  "name": "Online School Seva",
+  "short_name": "School Seva",
+  "description": "मराठी शैक्षणिक ऑनलाइन सेवा",
+  "lang": "mr-IN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#123d52"
+}

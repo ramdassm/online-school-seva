@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d52">
+  <meta name="description" content="Online School Seva - शैक्षणिक ऑनलाइन सेवा">
+  <title>Online School Seva</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+    header {
+      background: #123d52;
+      color: white;
+      padding: 24px 16px;
+    }
+    .wrap { max-width: 900px; margin: auto; }
+    h1 { font-size: 25px; margin: 0 0 8px; }
+    h2 { font-size: 20px; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 15px 0;
+    }
+    button, input, select, textarea { font: inherit; }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 14px;
+      cursor: pointer;
+    }
+    .nav { background: white; color: #123d52; }
+    .primary { background: #123d52; color: white; }
+    main { padding: 0 15px 25px; }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 17px;
+      margin-bottom: 14px;
+    }
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+    }
+    .service {
+      background: white;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+      min-height: 105px;
+    }
+    .service:hover { border-color: #0e7490; }
+    .field {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      margin-top: 5px;
+      background: white;
+    }
+    label { display: block; margin: 14px 0; font-weight: 600; }
+    .muted { color: #64748b; font-size: 13px; }
+    .hidden { display: none !important; }
+    .notice {
+      background: #dcfce7;
+      color: #166534;
+      padding: 12px;
+      border-radius: 9px;
+      margin: 10px 0;
+    }
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #e0f2fe;
+      color: #075985;
+      font-size: 13px;
+    }
+    .order { border-top: 1px solid #e2e8f0; padding: 14px 0; }
+    footer { text-align: center; padding: 20px; color: #64748b; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🎓 Online School Seva</h1>
+    <div>शैक्षणिक कामे आता ऑनलाइन!</div>
+    <p>शिष्यवृत्ती अर्ज • शाळेचे फॉर्म • विद्यार्थी नोंदणी</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav>
+    <button class="nav" data-page="home">🏠 मुख्यपृष्ठ</button>
+    <button class="nav" data-page="new">📝 नवीन ऑर्डर</button>
+    <button class="nav" data-page="track">🔎 ऑर्डर तपासा</button>
+    <button class="nav" data-page="admin">🔐 Admin Panel</button>
+  </nav>
+
+  <div id="message" class="notice hidden" role="status"></div>
+
+  <section id="home" class="page">
+    <div class="card">
+      <h2>आपले स्वागत आहे! 👋</h2>
+      <p>तुम्हाला हवी असलेली शैक्षणिक सेवा निवडा.</p>
+      <button class="primary" data-open="new">ऑर्डर नोंदवा →</button>
+    </div>
+    <h2>आमच्या सेवा</h2>
+    <div class="services" id="services"></div>
+  </section>
+
+  <section id="new" class="page hidden">
+    <div class="card">
+      <h2>नवीन ऑर्डर नोंदणी</h2>
+      <p class="muted">या आवृत्तीत पेमेंट सुविधा नाही.</p>
+      <form id="orderForm">
+        <label>सेवा निवडा *
+          <select class="field" id="service" required>
+            <option value="">सेवा निवडा</option>
+            <option>शिष्यवृत्ती अर्ज</option>
+            <option>शाळेचे ऑनलाइन फॉर्म</option>
+            <option>विद्यार्थी नोंदणी</option>
+            <option>सरकारी शैक्षणिक योजना</option>
+            <option>इतर ऑनलाइन कामे</option>
+          </select>
+        </label>
+        <label>ग्राहकाचे नाव *
+          <input class="field" id="name" required maxlength="80">
+        </label>
+        <label>मोबाइल नंबर *
+          <input class="field" id="mobile" type="tel"
+            inputmode="numeric" pattern="[0-9]{10}"
+            maxlength="10" placeholder="10 अंकी नंबर" required>
+        </label>
+        <label>कामाची माहिती
+          <textarea class="field" id="details" rows="3"
+            maxlength="1000"
+            placeholder="कामाची थोडक्यात माहिती"></textarea>
+        </label>
+        <p class="muted">
+          डेमोमध्ये आधार क्रमांक, पासवर्ड किंवा खरी संवेदनशील कागदपत्रे देऊ नका.
+        </p>
+        <button class="primary" type="submit">ऑर्डर सबमिट करा</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="track" class="page hidden">
+    <div class="card">
+      <h2>ऑर्डरची स्थिती</h2>
+      <form id="trackForm">
+        <label>ऑर्डर क्रमांक
+          <input class="field" id="trackId"
+            placeholder="OSS-123456" required>
+        </label>
+        <button class="primary">स्थिती तपासा</button>
+      </form>
+      <div id="trackResult" style="margin-top:15px"></div>
+    </div>
+  </section>
+
+  <section id="admin" class="page hidden">
+    <div class="card">
+      <h2>Admin Panel</h2>
+      <p class="muted">
+        चाचणी PIN: <strong>1234</strong>
+      </p>
+      <form id="loginForm">
+        <label>Admin PIN
+          <input class="field" id="pin" type="password"
+            inputmode="numeric" required>
+        </label>
+        <button class="primary">लॉगिन</button>
+      </form>
+      <div id="adminArea" class="hidden">
+        <hr>
+        <h3>सर्व ऑर्डर्स</h3>
+        <p id="stats"></p>
+        <div id="ordersList"></div>
+        <button id="logout" class="nav">लॉगआउट</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Online School Seva · फ्री डेमो · पेमेंट नाही</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const serviceList = [
+    ["🎓", "शिष्यवृत्ती अर्ज"],
+    ["📝", "शाळेचे ऑनलाइन फॉर्म"],
+    ["👨‍🎓", "विद्यार्थी नोंदणी"],
+    ["🏫", "सरकारी शैक्षणिक योजना"],
+    ["💻", "इतर ऑनलाइन कामे"]
+  ];
+  const statuses = [
+    "नवीन ऑर्डर",
+    "काम सुरू आहे",
+    "अधिक माहिती आवश्यक",
+    "काम पूर्ण झाले",
+    "रद्द केले"
+  ];
+
+  // हा स्थानिक डेमो आहे. उत्पादनासाठी सुरक्षित बॅकएंड आवश्यक आहे.
+  let orders = [];
+  let adminLoggedIn = false;
+
+  try {
+    orders = JSON.parse(
+      localStorage.getItem("oss_orders") || "[]"
+    );
+    if (!Array.isArray(orders)) orders = [];
+  } catch {
+    orders = [];
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
+  function saveOrders() {
+    try {
+      localStorage.setItem("oss_orders", JSON.stringify(orders));
+      return true;
+    } catch {
+      showMessage("डेटा साठवता आला नाही.");
+      return false;
+    }
+  }
+
+  function showMessage(text) {
+    $("message").textContent = text;
+    $("message").classList.remove("hidden");
+  }
+
+  function navigate(page) {
+    document.querySelectorAll(".page").forEach(section => {
+      section.classList.toggle("hidden", section.id !== page);
+    });
+    if (page === "admin" && adminLoggedIn) renderAdmin();
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll("[data-page]").forEach(button => {
+    button.addEventListener("click", () => {
+      navigate(button.dataset.page);
+    });
+  });
+
+  document.querySelectorAll("[data-open]").forEach(button => {
+    button.addEventListener("click", () => navigate(button.dataset.open));
+  });
+
+  $("services").innerHTML = serviceList.map(([icon, name]) => `
+    <button class="service" data-service="${escapeHTML(name)}">
+      <div style="font-size:26px">${icon}</div>
+      <strong>${escapeHTML(name)}</strong>
+      <div class="muted">सेवा निवडा →</div>
+    </button>
+  `).join("");
+
+  document.querySelectorAll("[data-service]").forEach(button => {
+    button.addEventListener("click", () => {
+      $("service").value = button.dataset.service;
+      navigate("new");
+    });
+  });
+
+  function findOrder(id) {
+    return orders.find(order =>
+      order.id.toLowerCase() === id.trim().toLowerCase()
+    );
+  }
+
+  $("orderForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const service = $("service").value;
+    const name = $("name").value.trim();
+    const mobile = $("mobile").value.trim();
+
+    if (!service || !name || !/^[0-9]{10}$/.test(mobile)) {
+      showMessage("कृपया सर्व आवश्यक माहिती योग्य भरा.");
+      return;
+    }
+
+    const id = "OSS-" + Math.floor(100000 + Math.random() * 900000);
+    const order = {
+      id,
+      service,
+      name,
+      mobile,
+      details: $("details").value.trim(),
+      status: statuses[0],
+      created: new Date().toLocaleString("mr-IN")
+    };
+
+    orders.unshift(order);
+    if (!saveOrders()) {
+      orders.shift();
+      return;
+    }
+
+    $("orderForm").reset();
+    $("trackId").value = id;
+    $("trackResult").innerHTML = `
+      <div class="notice">
+        <strong>ऑर्डर नोंदवली!</strong>
+        <p>तुमचा ऑर्डर क्रमांक:</p>
+        <h2>${escapeHTML(id)}</h2>
+        <p>हा क्रमांक जतन करून ठेवा.</p>
+      </div>
+    `;
+
+    navigate("track");
+  });
+
+  function showTrack(id) {
+    const order = findOrder(id);
+    if (!order) {
+      $("trackResult").textContent = "ऑर्डर सापडली नाही.";
+      return;
+    }
+
+    $("trackResult").innerHTML = `
+      <div class="card">
+        <h3>${escapeHTML(order.id)}</h3>
+        <span class="status">${escapeHTML(order.status)}</span>
+        <p><strong>सेवा:</strong> ${escapeHTML(order.service)}</p>
+        <p><strong>नाव:</strong> ${escapeHTML(order.name)}</p>
+        <p><strong>दिनांक:</strong> ${escapeHTML(order.created)}</p>
+      </div>
+    `;
+  }
+
+  $("trackForm").addEventListener("submit", event => {
+    event.preventDefault();
+    showTrack($("trackId").value);
+  });
+
+  $("loginForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    if ($("pin").value !== "1234") {
+      showMessage("चुकीचा PIN.");
+      return;
+    }
+
+    adminLoggedIn = true;
+    $("loginForm").classList.add("hidden");
+    $("adminArea").classList.remove("hidden");
+    renderAdmin();
+  });
+
+  function renderAdmin() {
+    if (!adminLoggedIn) return;
+
+    const pending = orders.filter(
+      order => order.status === "नवीन ऑर्डर"
+    ).length;
+
+    $("stats").textContent =
+      `एकूण ऑर्डर्स: ${orders.length} | नवीन: ${pending}`;
+
+    $("ordersList").innerHTML = orders.length
+      ? orders.map(order => `
+        <div class="order">
+          <strong>${escapeHTML(order.id)}</strong>
+          <p>${escapeHTML(order.service)}</p>
+          <p>${escapeHTML(order.name)} · ${escapeHTML(order.mobile)}</p>
+          <label>स्थिती बदला
+            <select class="field statusSelect"
+              data-id="${escapeHTML(order.id)}">
+              ${statuses.map(status => `
+                <option ${status === order.status ? "selected" : ""}>
+                  ${escapeHTML(status)}
+                </option>
+              `).join("")}
+            </select>
+          </label>
+        </div>
+      `).join("")
+      : "<p>अद्याप कोणतीही ऑर्डर नाही.</p>";
+
+    document.querySelectorAll(".statusSelect").forEach(select => {
+      select.addEventListener("change", () => {
+        const order = findOrder(select.dataset.id);
+        if (!order) return;
+
+        const previousStatus = order.status;
+        order.status = select.value;
+
+        if (!saveOrders()) {
+          order.status = previousStatus;
+          renderAdmin();
+          return;
+        }
+
+        renderAdmin();
+        showMessage("ऑर्डर स्थिती बदलली.");
+      });
+    });
+  }
+
+  $("logout").addEventListener("click", () => {
+    adminLoggedIn = false;
+    $("adminArea").classList.add("hidden");
+    $("loginForm").classList.remove("hidden");
+    $("pin").value = "";
+  });
+
+  // HTTPS होस्टिंगवरच PWA Service Worker नोंदवा.
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
