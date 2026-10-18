@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Online School Seva - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 440px;
+      margin: 35px auto;
+      padding: 20px;
+      background: #f4f7fb;
+    }
+    main {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 3px 16px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+    }
+    button { cursor: pointer; }
+    #message { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+<main>
+  <h2>Online School Seva</h2>
+  <h3>Login / लॉगिन</h3>
+
+  <form id="emailForm">
+    <input id="email" type="email"
+      placeholder="ई-मेल" required>
+    <input id="password" type="password"
+      placeholder="पासवर्ड" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <button id="reset">पासवर्ड विसरलात?</button>
+
+  <hr>
+  <h3>मोबाईल OTP Login</h3>
+  <input id="phone" type="tel"
+    placeholder="+919876543210">
+  <div id="recaptcha-container"></div>
+  <button id="sendOtp">OTP पाठवा</button>
+  <input id="otp" inputmode="numeric"
+    placeholder="SMS मधील OTP">
+  <button id="verifyOtp">OTP तपासा</button>
+
+  <p id="message" role="status"></p>
+  <div id="profile" hidden>
+    <p id="userInfo"></p>
+    <button id="dashboard">Dashboard उघडा</button>
+    <button id="logout">Logout</button>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword,
+    sendPasswordResetEmail, RecaptchaVerifier,
+    signInWithPhoneNumber, onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+  // Firebase Console मधील खरा config इथे भरा.
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const $ = id => document.getElementById(id);
+  let confirmation = null;
+
+  function message(text) {
+    $("message").textContent = text;
+  }
+
+  async function getRole(user) {
+    // Role फक्त सुरक्षित Firestore document मधून.
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists()) return null;
+    return snap.data().role;
+  }
+
+  async function openDashboard(user) {
+    const role = await getRole(user);
+    if (!role || !["admin", "teacher"].includes(role)) {
+      await signOut(auth);
+      message("या खात्याला प्रवेश दिलेला नाही.");
+      return;
+    }
+    $("emailForm").hidden = true;
+    $("profile").hidden = false;
+    $("userInfo").textContent =
+      user.email || user.phoneNumber || user.uid;
+    $("dashboard").onclick = () => {
+      location.href = role === "admin"
+        ? "admin.html" : "teacher.html";
+    };
+    message("लॉगिन यशस्वी. भूमिका: " + role);
+  }
+
+  $("emailForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    try {
+      const credential = await signInWithEmailAndPassword(
+        auth, $("email").value.trim(), $("password").value
+      );
+      await openDashboard(credential.user);
+    } catch (error) {
+      message("लॉगिन अयशस्वी. ई-मेल व पासवर्ड तपासा.");
+    }
+  });
+
+  $("reset").onclick = async () => {
+    const email = $("email").value.trim();
+    if (!email) return message("आधी ई-मेल लिहा.");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      message("पासवर्ड रिसेट लिंक ई-मेलवर पाठवली.");
+    } catch {
+      message("रिसेट विनंती पूर्ण झाली नाही.");
+    }
+  };
+
+  $("sendOtp").onclick = async () => {
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth, "recaptcha-container", {}
+        );
+      }
+      confirmation = await signInWithPhoneNumber(
+        auth, $("phone").value.trim(),
+        window.recaptchaVerifier
+      );
+      message("OTP पाठवला आहे.");
+    } catch (error) {
+      message("OTP पाठवता आला नाही. नंबर व reCAPTCHA तपासा.");
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+    }
+  };
+
+  $("verifyOtp").onclick = async () => {
+    if (!confirmation) return message("आधी OTP मागवा.");
+    try {
+      const result = await confirmation.confirm($("otp").value.trim());
+      await openDashboard(result.user);
+    } catch {
+      message("OTP चुकीचा किंवा कालबाह्य आहे.");
+    }
+  };
+
+  $("logout").onclick = () => signOut(auth);
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      $("profile").hidden = true;
+      $("emailForm").hidden = false;
+      return;
+    }
+    try {
+      await openDashboard(user);
+    } catch {
+      message("वापरकर्त्याची भूमिका तपासता आली नाही.");
+    }
+  });
+</script>
+</body>
+</html>
